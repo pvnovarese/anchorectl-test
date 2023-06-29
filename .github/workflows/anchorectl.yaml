@@ -38,13 +38,14 @@ jobs:
         registry: ${{ env.REGISTRY }}
         username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}      
-      
-    - name: build local container
-      uses: docker/build-push-action@v3
-      with:
-        tags: ${{ env.IMAGE }}
-        push: true
-        load: false
+     
+    ### commenting this out temporarily, there's no reason to actually build this, it's just slowing me down
+    #- name: build local container
+    #  uses: docker/build-push-action@v3
+    #  with:
+    #    tags: ${{ env.IMAGE }}
+    #    push: true
+    #    load: false
 
 
 
