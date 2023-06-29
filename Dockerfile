@@ -5,5 +5,12 @@ FROM registry.access.redhat.com/ubi9-minimal:latest
 LABEL maintainer="pvn@novarese.net"
 LABEL name="anchorectl-test"
 
-USER root 
+RUN set -ex && \
+    microdnf -y install nodejs && \
+    npm install -g --cache /tmp/empty-cache darcyclarke-manifest-pkg && \
+    npm cache clean --force && \
+    microdnf -y clean all && \
+    rm -rf /var/cache/yum /tmp 
+
+USER nobody 
 ENTRYPOINT /bin/false
