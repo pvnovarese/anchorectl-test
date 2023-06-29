@@ -11,4 +11,4 @@
       enabled: false
       scope: Squashed
     skip-files-above-size: 1048576
-    globs: ['/etc/passwd', '/etc/os-release', '/usr/lib/os-release' '/image_build_timestamp']
+    globs: ['/etc/passwd', '/etc/os-release', '/usr/lib/os-release', '/image_build_timestamp']
