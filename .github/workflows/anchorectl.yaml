@@ -76,7 +76,7 @@ jobs:
     
     - name: Queue Image for Scanning by Anchore Enterprise
       run: |        
-       anchorectl image add --no-auto-subscribe --wait --dockerfile Dockerfile --from registry ${IMAGE} 
+       anchorectl -vv image add --no-auto-subscribe --wait --dockerfile Dockerfile --from registry ${IMAGE} 
                 
     - name: Pull Vulnerability List
       run: |
