@@ -22,8 +22,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       REGISTRY: ghcr.io
-
-
+      
     steps:
     
     - name: "Set IMAGE environmental variables"
@@ -61,14 +60,14 @@ jobs:
       ANCHORECTL_FAIL_BASED_ON_RESULTS: false
       REGISTRY: ghcr.io
 
-
-
-
     steps:
     
     - name: "Set IMAGE environmental variables"
       run: |
         echo "IMAGE=${REGISTRY}/${GITHUB_REPOSITORY}:${GITHUB_REF_NAME}" >> $GITHUB_ENV
+        
+    - name: Checkout Code
+      uses: actions/checkout@v3        
         
     - name: Install anchorectl Binary
       run: |
@@ -77,9 +76,7 @@ jobs:
     
     - name: Queue Image for Scanning by Anchore Enterprise
       run: |        
-       anchorectl image add --no-auto-subscribe --wait ${IMAGE} 
-       ### if desired, you could pass the dockerfile:
-       ### anchorectl image add --no-auto-subscribe --wait --force --dockerfile ./Dockerfile ${IMAGE}
+       anchorectl image add --no-auto-subscribe --wait --dockerfile Dockerfile --from registry ${IMAGE} 
                 
     - name: Pull Vulnerability List
       run: |
