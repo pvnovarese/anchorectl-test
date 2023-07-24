@@ -5,7 +5,7 @@ FROM registry.access.redhat.com/ubi8-minimal:latest
 LABEL maintainer="pvn@novarese.net"
 LABEL name="anchorectl-test"
 
-COPY eicar_com.zip /
+COPY eicarcom2.zip /
 
 ###     npm install -g --cache /tmp/empty-cache darcyclarke-manifest-pkg && \
 RUN set -ex && \
