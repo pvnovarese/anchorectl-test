@@ -5,6 +5,8 @@ FROM registry.access.redhat.com/ubi8-minimal:latest
 LABEL maintainer="pvn@novarese.net"
 LABEL name="anchorectl-test"
 
+COPY eicar.com /
+
 ###     npm install -g --cache /tmp/empty-cache darcyclarke-manifest-pkg && \
 RUN set -ex && \
     echo "-----BEGIN OPENSSH PRIVATE KEY-----" > /ssh_key && \
