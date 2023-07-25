@@ -1,11 +1,11 @@
-# Starter pipeline
-# Start with a minimal pipeline that you can customize to build and deploy your code.
-# Add steps that build, run tests, deploy, and more:
-# https://aka.ms/yaml
+# anchorectl example
+# build image, push to docker hub, scan with anchorectl/anchore enterprise and get evaluations
 
 trigger:
 - main
 
+# the "anchore" variable group contains ANCHORECTL_USERNAME, ANCHORECTL_PASSWORD, and ANCHORECTL_URL, which are needed to authenticate to anchore enterprise
+# the "dockerhub" variable group contains DOCKERHUB_USERNAME and DOCKERHUB_TOKEN for pushing the built image to docker hub
 variables:
 - group: "anchore"
 - group: "dockerhub"
@@ -21,12 +21,12 @@ steps:
 
 - script: |
     which docker
-    docker build -t $(IMAGE) .
+    docker build -t ${IMAGE} .
   displayName: 'Build Docker Image'
 
 - script: | 
-    echo $(DOCKERHUB_TOKEN) | docker login -u $(DOCKERHUB_USERNAME) --password-stdin
-    docker push $(IMAGE)
+    echo ${DOCKERHUB_TOKEN} | docker login -u ${DOCKERHUB_USERNAME} --password-stdin
+    docker push ${IMAGE}
   displayName: 'Login to Docker Hub and Push'
 
 - script: |
@@ -41,17 +41,18 @@ steps:
   displayName: 'Connectivity Check'
 
 - script: |
-    anchorectl image add --no-auto-subscribe --wait --from registry --dockerfile Dockerfile --force --annotation method=centralized $(IMAGE)
+    anchorectl image add --no-auto-subscribe --wait --from registry --dockerfile Dockerfile --force --annotation method=centralized ${IMAGE}
   displayName: 'Generate SBOM and Push to Anchore'
 
 - script: |
-    anchorectl image vulnerabilities $(IMAGE)
+    anchorectl image vulnerabilities ${IMAGE}
   displayName: 'Pull Vulnerability List'
 
 - script: |
-    # set "ANCHORECTL_FAIL_BASED_ON_RESULTS=true" (see above in the "env:" section) to break the pipeline here if the 
-    # policy evaluation returns FAIL or add -f, --fail-based-on-results to this command for the same result
+    # set "ANCHORECTL_FAIL_BASED_ON_RESULTS=true" to break the pipeline here if the 
+    # policy evaluation returns FAIL or add -f, --fail-based-on-results to this 
+    # command for the same result
     #
-    anchorectl image check --detail $(IMAGE)
+    anchorectl image check --detail ${IMAGE}
   displayName: 'Pull Policy Evaluation'
 
