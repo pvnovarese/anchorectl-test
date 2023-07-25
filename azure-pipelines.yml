@@ -8,6 +8,8 @@ trigger:
 
 variables:
 - group: "anchore"
+- name: IMAGE
+  value: docker.io/pvnovarese/anchorectl-azure-test:latest
 
 pool:
   vmImage: ubuntu-latest
@@ -18,14 +20,31 @@ steps:
 
 - script: |
     which docker
-    docker build -t anchorectl-azure-test:latest .
+    docker build -t $(IMAGE) .
   displayName: 'Build Docker Image'
 
 - script: |
     curl -sSfL https://anchorectl-releases.anchore.io/anchorectl/install.sh | sh -s -- -b ${HOME}/.local/bin
     export PATH="${HOME}/.local/bin/:${PATH}"
-    docker image ls
-    anchorectl version
-    env
-    anchorectl system status
   displayName: 'Install anchorectl Binary'
+
+- script: |
+    anchorectl version
+    anchorectl system status
+    anchorectl feed list
+  displayName: 'Connectivity Check'
+
+- script: |
+    anchorectl image add --no-auto-subscribe --wait --from registry --dockerfile Dockerfile --force --from docker $(IMAGE)
+  displayName: 'Generate SBOM and Push to Anchore'
+
+- script: |
+    anchorectl image vulnerabilities $(IMAGE)
+  displayName: 'Pull Vulnerability List'
+
+- script: |
+    # set "ANCHORECTL_FAIL_BASED_ON_RESULTS=true" (see above in the "env:" section) to break the pipeline here if the 
+    # policy evaluation returns FAIL or add -f, --fail-based-on-results to this command for the same result
+    #
+    anchorectl image check --detail $(IMAGE)
+  displayName: 'Pull Policy Evaluation'
