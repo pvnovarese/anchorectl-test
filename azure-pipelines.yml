@@ -8,6 +8,7 @@ trigger:
 
 variables:
 - group: "anchore"
+- group: "dockerhub"
 - name: IMAGE
   value: docker.io/pvnovarese/anchorectl-azure-test:latest
 
@@ -23,6 +24,11 @@ steps:
     docker build -t $(IMAGE) .
   displayName: 'Build Docker Image'
 
+- script: | 
+    echo $(DOCKERHUB_TOKEN) | docker login -u $(DOCKERHUB_USERNAME) --password-stdin
+    docker push $(IMAGE)
+  displayName: 'Login to Docker Hub and Push'
+
 - script: |
     curl -sSfL https://anchorectl-releases.anchore.io/anchorectl/install.sh | sh -s -- -b ${HOME}/.local/bin
     export PATH="${HOME}/.local/bin/:${PATH}"
@@ -35,7 +41,7 @@ steps:
   displayName: 'Connectivity Check'
 
 - script: |
-    anchorectl image add --no-auto-subscribe --wait --from registry --dockerfile Dockerfile --force --from docker $(IMAGE)
+    anchorectl image add --no-auto-subscribe --wait --from registry --dockerfile Dockerfile --force --annotation method=centralized $(IMAGE)
   displayName: 'Generate SBOM and Push to Anchore'
 
 - script: |
@@ -48,3 +54,4 @@ steps:
     #
     anchorectl image check --detail $(IMAGE)
   displayName: 'Pull Policy Evaluation'
+
