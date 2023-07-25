@@ -6,6 +6,9 @@
 trigger:
 - main
 
+variables:
+- group: "anchore"
+
 pool:
   vmImage: ubuntu-latest
 
@@ -23,4 +26,6 @@ steps:
     export PATH="${HOME}/.local/bin/:${PATH}"
     docker image ls
     anchorectl version
+    env
+    anchorectl system status
   displayName: 'Install anchorectl Binary'
