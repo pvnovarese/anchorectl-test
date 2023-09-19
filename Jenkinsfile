@@ -115,7 +115,6 @@ pipeline {
         //
         // call the plugin
         anchore name: 'anchore_images', bailOnFail: false, engineRetries: '900'
-        }
       } // end steps
     } // end stage "analyze image 1 with anchore plugin"     
     
