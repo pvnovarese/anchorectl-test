@@ -10,15 +10,11 @@ pipeline {
     // this splits the credential into DOCKER_HUB_USR and DOCKER_HUB_PSW
     //
     REPOSITORY = "${DOCKER_HUB_USR}/${JOB_BASE_NAME}"
+    BRANCH_NAME = "${GIT_BRANCH.split("/")[1]}"
     TAG = "${BRANCH_NAME}"
     //
     // IMAGELINE is what we pass to the Anchore Plugin
     IMAGELINE = "${REPOSITORY}:${TAG}"
-    //
-    // you don't really need this, it was just something I was poking at if 
-    // promoting images
-    //BRANCH_NAME = "${GIT_BRANCH.split("/")[1]}"
-    //
     //
   } // end environment 
   
@@ -78,11 +74,9 @@ pipeline {
             ###
             ### --dockerfile is optional but if you want to test Dockerfile instructions this is recommended
             ###
-            ### --from docker tells anchorectl to analyze the image locally from the docker daemon instead of adding
-            ### to the queoe for the Anchore Enterprise deployment to pull and scan.  You can also use --from registry
-            ### if you want to create the sbom locally but pull the image from a registry first.
+            ### --from registry tells anchorectl to analyze the image locally 
             #
-            anchorectl image add --wait --dockerfile ./Dockerfile --from docker ${REGISTRY}/${REPOSITORY}:${TAG} 
+            anchorectl image add --wait --dockerfile ./Dockerfile --from registry ${REGISTRY}/${REPOSITORY}:${TAG} 
             # 
             ### 
             ### if you want to do the traditional centralized scan, just leave off the --from option:
@@ -123,7 +117,7 @@ pipeline {
     //stage('Promote Image') {
     //  steps {
     //    sh """
-    //      docker tag ${REPOSITORY}:${TAG} ${REPOSITORY}:${BRANCH_NAME}
+    //      docker tag ${REPOSITORY}:${TAG} ${REPOSITORY}:production
     //      docker push ${REPOSITORY}:${BRANCH_NAME}
     //    """
     //  } // end steps
@@ -134,7 +128,7 @@ pipeline {
         //
         // don't need the image(s) anymore so let's rm it
         //
-        sh 'docker image rm ${REPOSITORY}:${TAG} ${REPOSITORY}:${BRANCH_NAME} || failure=1'
+        sh 'docker image rm ${REPOSITORY}:${TAG} ${REPOSITORY}:production || failure=1'
         // the || failure=1 just allows us to continue even if one or both of the tags we're
         // rm'ing doesn't exist (e.g. if the evaluation failed, we might end up here without 
         // re-tagging the image, so ${BRANCH_NAME} wouldn't exist.
