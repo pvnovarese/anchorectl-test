@@ -1,4 +1,4 @@
-name: Anchore Enterprise Distributed Scan
+name: BETA Distributed Scan
 
 on:
   ### UNCOMMENT THIS SECTION TO AUTOBUILD ON ANY PUSH
